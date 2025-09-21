@@ -1,1298 +1,197 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام إدارة المشتريات والمبيعات</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --primary-color: #2c3e50;
-            --secondary-color: #3498db;
-            --accent-color: #e74c3c;
-            --light-color: #ecf0f1;
-            --dark-color: #2c3e50;
-            --success-color: #27ae60;
-            --warning-color: #f39c12;
-        }
-        
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        
-        body {
-            font-family: 'Tahoma', Arial, sans-serif;
-            background-color: #f8f9fa;
-            color: #333;
-            line-height: 1.6;
-            padding: 0;
-            margin: 0;
-        }
-        
-        .navbar {
-            background-color: var(--primary-color);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 1030;
-        }
-        
-        .sidebar {
-            background-color: var(--dark-color);
-            color: white;
-            height: 100vh;
-            position: fixed;
-            padding-top: 60px;
-            width: 250px;
-            transition: all 0.3s ease;
-            z-index: 1020;
-            overflow-y: auto;
-            top: 0;
-            right: 0;
-        }
-        
-        .sidebar.collapsed {
-            width: 70px;
-        }
-        
-        .sidebar.collapsed .nav-link span {
-            display: none;
-        }
-        
-        .sidebar .nav-link {
-            color: rgba(255, 255, 255, 0.8);
-            padding: 12px 20px;
-            margin: 4px 0;
-            border-radius: 4px;
-            white-space: nowrap;
-            display: flex;
-            align-items: center;
-        }
-        
-        .sidebar .nav-link:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-            color: white;
-        }
-        
-        .sidebar .nav-link.active {
-            background-color: var(--secondary-color);
-            color: white;
-        }
-        
-        .sidebar .nav-link i {
-            margin-left: 10px;
-            width: 20px;
-            text-align: center;
-        }
-        
-        .main-content {
-            margin-right: 250px;
-            padding: 20px;
-            padding-top: 80px;
-            transition: all 0.3s ease;
-            min-height: 100vh;
-        }
-        
-        .main-content.expanded {
-            margin-right: 70px;
-        }
-        
-        .card {
-            border: none;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-            transition: transform 0.3s, box-shadow 0.3s;
-            overflow: hidden;
-        }
-        
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
-        }
-        
-        .stat-card {
-            text-align: center;
-            padding: 20px;
-        }
-        
-        .stat-card i {
-            font-size: 2.5rem;
-            margin-bottom: 15px;
-            color: var(--secondary-color);
-        }
-        
-        .stat-card .number {
-            font-size: 2rem;
-            font-weight: bold;
-        }
-        
-        .stat-card .label {
-            color: #6c757d;
-            font-size: 0.9rem;
-        }
-        
-        .dashboard-header {
-            background: linear-gradient(to right, #2c3e50, #4ca1af);
-            color: white;
-            padding: 30px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-        }
-        
-        .table th {
-            background-color: var(--primary-color);
-            color: white;
-        }
-        
-        .btn-primary {
-            background-color: var(--secondary-color);
-            border: none;
-        }
-        
-        .btn-primary:hover {
-            background-color: #2980b9;
-        }
-        
-        .notification-badge {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            background-color: var(--accent-color);
-            color: white;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            font-size: 0.7rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .page {
-            display: none;
-        }
-        
-        .page.active {
-            display: block;
-            animation: fadeIn 0.5s;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        .form-control:focus, .form-select:focus {
-            border-color: var(--secondary-color);
-            box-shadow: 0 0 0 0.25rem rgba(52, 152, 219, 0.25);
-        }
-        
-        .modal-content {
-            border-radius: 10px;
-        }
-        
-        .search-box {
-            position: relative;
-        }
-        
-        .search-box input {
-            padding-right: 40px;
-        }
-        
-        .search-box i {
-            position: absolute;
-            right: 15px;
-            top: 12px;
-            color: #6c757d;
-        }
-        
-        .product-img {
-            width: 60px;
-            height: 60px;
-            object-fit: cover;
-            border-radius: 5px;
-        }
-        
-        .action-buttons .btn {
-            padding: 0.25rem 0.5rem;
-            font-size: 0.875rem;
-        }
-        
-        /* تحسينات للجوال */
-        @media (max-width: 992px) {
-            .sidebar {
-                width: 70px;
-            }
-            
-            .sidebar .nav-link span {
-                display: none;
-            }
-            
-            .main-content {
-                margin-right: 70px;
-            }
-            
-            .main-content.expanded {
-                margin-right: 0;
-            }
-            
-            .sidebar.expanded {
-                width: 250px;
-                z-index: 1050;
-            }
-            
-            .sidebar.expanded .nav-link span {
-                display: inline;
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
-                padding-top: 20px;
-                display: none;
-            }
-            
-            .sidebar.expanded {
-                display: block;
-            }
-            
-            .main-content {
-                margin-right: 0;
-                padding-top: 20px;
-            }
-        }
-
-        /* تخصيص القائمة المنسدلة */
-        .dropdown-menu {
-            background-color: white;
-            border: 1px solid rgba(0,0,0,.15);
-            border-radius: 0.375rem;
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-        }
-        
-        .dropdown-item {
-            padding: 0.5rem 1rem;
-            color: #212529;
-        }
-        
-        .dropdown-item:hover {
-            background-color: #f8f9fa;
-            color: #1e2125;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>مختبر أسئلة تفاعلي</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f7fa;
+      color: #333;
+      margin: 0;
+      padding: 0;
+      direction: rtl;
+    }
+    .container {
+      max-width: 700px;
+      margin: 40px auto;
+      padding: 20px 24px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(0,0,0,.08);
+    }
+    h1 {
+      font-size: 1.6rem;
+      margin-bottom: 16px;
+    }
+    .q-title {
+      font-size: 1.15rem;
+      margin-bottom: 12px;
+    }
+    .option {
+      display: block;
+      margin: 8px 0;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      background: #fafafa;
+      cursor: pointer;
+    }
+    .option:hover {
+      background: #f0f0f0;
+    }
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 14px;
+    }
+    button {
+      padding: 10px 14px;
+      border: none;
+      border-radius: 8px;
+      background: #2e7d32;
+      color: white;
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+    button.secondary {
+      background: #555;
+    }
+    .summary {
+      line-height: 1.6;
+    }
+    .answerRow {
+      padding: 6px 0;
+      border-bottom: 1px dashed #ddd;
+    }
+    .correct { color: #1e88e5; }
+  </style>
 </head>
 <body>
-    <!-- شريط التنقل العلوي -->
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#" onclick="showPage('dashboard')">
-                <i class="fas fa-store"></i> نظام إدارة المشتريات والمبيعات
-            </a>
-            <button class="navbar-toggler" type="button" onclick="toggleMobileSidebar()">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" onclick="showNotifications()">
-                            <i class="fas fa-bell"></i> 
-                            <span class="notification-badge">3</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" onclick="showPage('settings')">
-                            <i class="fas fa-cog"></i> الإعدادات
-                        </a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" onclick="toggleDropdown()">
-                            <i class="fas fa-user"></i> حسيني أحمد
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end" id="userDropdown" style="display: none;">
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-user-circle me-2"></i> الملف الشخصي</a></li>
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i> الإعدادات</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt me-2"></i> تسجيل خروج</a></li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
+  <div class="container" id="quiz-app">
+    <h1>اختبار قصير: اسئلة مبسطة</h1>
+    <div id="quiz-area"></div>
+    <div id="results-area" style="display:none;"></div>
+  </div>
+
+  <script>
+    // الأسئلة: عدّله حسب موضوعك
+    const questions = [
+      { q: "ما هو الملف الذي يحتوي على هيكل صفحة الويب؟", options: ["HTML", "CSS", "JS"], answer: 0 },
+      { q: "أي وسم في HTML يُستخدم لإضافة رابط؟", options: ["<p>", "<a>", "<div>"], answer: 1 },
+      { q: "ما هي وحدة القياس الشائعة في CSS للتحكم في حجم النص؟", options: ["px", "kg", "s"], answer: 0 },
+      { q: "أي لغة تستخدم عادة لإضافة التفاعل في صفحة الويب؟", options: ["Python", "HTML", "JavaScript"], answer: 2 },
+      { q: "أي وسم يُستخدم لإدراج صورة؟", options: ["<image>", "<img>", "<src>"], answer: 1 }
+    ];
+
+    let currentIndex = 0;
+    const answers = new Array(questions.length).fill(null);
+
+    const quizArea = document.getElementById('quiz-area');
+    const resultsArea = document.getElementById('results-area');
+
+    function renderQuestion() {
+      const q = questions[currentIndex];
+      // بناء خيارات السؤال كخانات اختيار radio
+      const optionsHtml = q.options.map((opt, i) => {
+        const checked = answers[currentIndex] === i ? 'checked' : '';
+        return `
+          <label class="option">
+            <input type="radio" name="option" value="${i}" ${checked} />
+            ${opt}
+          </label>
+        `;
+      }).join('');
+
+      quizArea.innerHTML = `
+        <div class="q-title">${currentIndex + 1}. ${q.q}</div>
+        <form id="option-form">
+          ${optionsHtml}
+        </form>
+        <div class="controls">
+          <button id="prev" ${currentIndex === 0 ? 'disabled' : ''}>السابق</button>
+          <button id="next">${currentIndex === questions.length - 1 ? 'انتهيت' : 'التالى'}</button>
         </div>
-    </nav>
+      `;
 
-    <!-- القائمة الجانبية -->
-    <div class="sidebar" id="sidebar">
-        <ul class="nav flex-column">
-            <li class="nav-item">
-                <a class="nav-link active" href="#" onclick="showPage('dashboard')">
-                    <i class="fas fa-home"></i> <span>لوحة التحكم</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#" onclick="showPage('inventory')">
-                    <i class="fas fa-boxes"></i> <span>إدارة المخزون</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#" onclick="showPage('sales')">
-                    <i class="fas fa-shopping-cart"></i> <span>المبيعات</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#" onclick="showPage('purchases')">
-                    <i class="fas fa-shopping-bag"></i> <span>المشتريات</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#" onclick="showPage('customers')">
-                    <i class="fas fa-users"></i> <span>العملاء</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#" onclick="showPage('suppliers')">
-                    <i class="fas fa-truck"></i> <span>الموردون</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#" onclick="showPage('reports')">
-                    <i class="fas fa-chart-line"></i> <span>التقارير</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#" onclick="showPage('accounting')">
-                    <i class="fas fa-calculator"></i> <span>الحسابات</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#" onclick="showPage('settings')">
-                    <i class="fas fa-wrench"></i> <span>الإعدادات</span>
-                </a>
-            </li>
-            <li class="nav-item mt-3">
-                <a class="nav-link" href="#" onclick="toggleSidebar()">
-                    <i class="fas fa-chevron-right" id="sidebar-toggle-icon"></i> 
-                    <span>طي القائمة</span>
-                </a>
-            </li>
-        </ul>
-    </div>
+      // تحديث المستمعين للأزرار بعد الDOM
+      document.getElementById('prev').addEventListener('click', () => {
+        // احفظ الاختيار الحالي قبل الانتقال
+        saveCurrentAnswer();
+        if (currentIndex > 0) {
+          currentIndex--;
+          renderQuestion();
+        }
+      });
 
-    <!-- المحتوى الرئيسي -->
-    <div class="main-content" id="main-content">
-        <!-- صفحة لوحة التحكم -->
-        <div class="page active" id="dashboard">
-            <div class="dashboard-header">
-                <h1>مرحباً بك في نظام الإدارة المتكامل</h1>
-                <p class="lead">نظام متكامل لإدارة المشتريات والمبيعات والمخزون والعملاء</p>
+      document.getElementById('next').addEventListener('click', () => {
+        // احفظ الاختيار الحالي
+        const chosen = document.querySelector('input[name="option"]:checked');
+        if (!chosen && answers[currentIndex] === null) {
+          alert('اختر إجابة قبل المتابعة.');
+          return;
+        }
+        saveCurrentAnswer();
+
+        if (currentIndex < questions.length - 1) {
+          currentIndex++;
+          renderQuestion();
+        } else {
+          showResults();
+        }
+      });
+    }
+
+    function saveCurrentAnswer() {
+      const chosen = document.querySelector('input[name="option"]:checked');
+      if (chosen) {
+        answers[currentIndex] = parseInt(chosen.value, 10);
+      }
+    }
+
+    function showResults() {
+      // حساب الدرجة
+      let score = 0;
+      const total = questions.length;
+      const perQ = questions.map((q, idx) => {
+        const ok = answers[idx] === q.answer;
+        if (ok) score++;
+        return { question: q.q, your: answers[idx] != null ? q.options[answers[idx]] : 'لم تُجاوب', correct: q.options[q.answer], ok };
+      });
+
+      resultsArea.style.display = 'block';
+      quizArea.style.display = 'none';
+
+      const summaryHtml = `
+        <h2>النتيجة: ${score} من ${total}</h2>
+        <div class="summary">
+          ${perQ.map((r, i) => `
+            <div class="answerRow">
+              <strong>س ${i+1}:</strong> سؤالك: ${r.question}<br/>
+              اخترته: ${r.your} &nbsp;
+              ${r.ok ? '<span class="correct">✅ صحيح</span>' : `<span style="color:#e53935">❌ خطأ. الإجابة الصحيحة: ${r.correct}</span>`}
             </div>
-
-            <div class="row">
-                <!-- بطاقات الإحصائيات -->
-                <div class="col-md-3 col-6">
-                    <div class="card stat-card">
-                        <i class="fas fa-shopping-cart"></i>
-                        <div class="number">248</div>
-                        <div class="label">طلب مبيعات جديد</div>
-                    </div>
-                </div>
-                <div class="col-md-3 col-6">
-                    <div class="card stat-card">
-                        <i class="fas fa-shopping-bag"></i>
-                        <div class="number">42</div>
-                        <div class="label">طلب شراء جديد</div>
-                    </div>
-                </div>
-                <div class="col-md-3 col-6">
-                    <div class="card stat-card">
-                        <i class="fas fa-box-open"></i>
-                        <div class="number">18</div>
-                        <div class="label">منتجات منخفضة المخزون</div>
-                    </div>
-                </div>
-                <div class="col-md-3 col-6">
-                    <div class="card stat-card">
-                        <i class="fas fa-users"></i>
-                        <div class="number">356</div>
-                        <div class="label">عميل نشط</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="row mt-4">
-                <div class="col-lg-8 col-md-7">
-                    <div class="card">
-                        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                            <h5 class="card-title mb-0">أحدث الطلبات</h5>
-                            <a href="#" class="text-white" onclick="showPage('sales')">عرض الكل</a>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>رقم الطلب</th>
-                                            <th>العميل</th>
-                                            <th>التاريخ</th>
-                                            <th>القيمة</th>
-                                            <th>الحالة</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>#ORD-2023-1052</td>
-                                            <td>شركة التقنية الحديثة</td>
-                                            <td>2023-10-15</td>
-                                            <td>5,250 ر.س</td>
-                                            <td><span class="badge bg-success">مكتمل</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td>#ORD-2023-1051</td>
-                                            <td>مؤسسة النهضة للتجارة</td>
-                                            <td>2023-10-14</td>
-                                            <td>3,800 ر.س</td>
-                                            <td><span class="badge bg-warning">قيد المعالجة</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td>#ORD-2023-1050</td>
-                                            <td>شركة المستقبل المحدودة</td>
-                                            <td>2023-10-14</td>
-                                            <td>7,600 ر.س</td>
-                                            <td><span class="badge bg-info">معلق</span></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-4 col-md-5">
-                    <div class="card">
-                        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                            <h5 class="card-title mb-0">المنتجات الأكثر مبيعاً</h5>
-                            <a href="#" class="text-white" onclick="showPage('inventory')">عرض الكل</a>
-                        </div>
-                        <div class="card-body">
-                            <ul class="list-group list-group-flush">
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    جهاز لوحي 10 بوصة
-                                    <span class="badge bg-primary rounded-pill">128</span>
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    هاتف ذكي - طراز Pro
-                                    <span class="badge bg-primary rounded-pill">95</span>
-                                </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    سماعات لاسلكية
-                                    <span class="badge bg-primary rounded-pill">87</span>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <div class="card mt-4">
-                        <div class="card-header bg-primary text-white">
-                            <h5 class="card-title mb-0">أنشطة حديثة</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="activity">
-                                <div class="d-flex align-items-start mb-3">
-                                    <div class="me-3">
-                                        <i class="fas fa-plus-circle text-success"></i>
-                                    </div>
-                                    <div>
-                                        <h6 class="mb-0">تم إضافة منتج جديد</h6>
-                                        <small class="text-muted">من قبل محمد السعدي - 10:30 ص</small>
-                                    </div>
-                                </div>
-                                <div class="d-flex align-items-start mb-3">
-                                    <div class="me-3">
-                                        <i class="fas fa-check-circle text-primary"></i>
-                                    </div>
-                                    <div>
-                                        <h6 class="mb-0">تم إكمال طلب #1052</h6>
-                                        <small class="text-muted">من قبل نظام التوصيل - 09:45 ص</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+          `).join('')}
         </div>
-
-        <!-- صفحة إدارة المخزون -->
-        <div class="page" id="inventory">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2>إدارة المخزون</h2>
-                <button class="btn btn-primary" onclick="openAddProductModal()">
-                    <i class="fas fa-plus me-2"></i>إضافة منتج جديد
-                </button>
-            </div>
-
-            <div class="row mb-4">
-                <div class="col-md-6 mb-3">
-                    <div class="search-box">
-                        <input type="text" class="form-control" placeholder="بحث في المنتجات...">
-                        <i class="fas fa-search"></i>
-                    </div>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <select class="form-select">
-                        <option selected>جميع الفئات</option>
-                        <option>الإلكترونيات</option>
-                        <option>ملحقات الحاسب</option>
-                    </select>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <select class="form-select">
-                        <option selected>ترتيب حسب الأحدث</option>
-                        <option>ترتيب حسب الأقدم</option>
-                        <option>ترتيب حسب الكمية</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>الصورة</th>
-                                    <th>اسم المنتج</th>
-                                    <th>SKU</th>
-                                    <th>السعر</th>
-                                    <th>الكمية</th>
-                                    <th>الحالة</th>
-                                    <th>الإجراءات</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><img src="https://via.placeholder.com/60" class="product-img" alt="منتج"></td>
-                                    <td>هاتف ذكي - طراز Pro</td>
-                                    <td>PRD-001</td>
-                                    <td>2,499 ر.س</td>
-                                    <td>45</td>
-                                    <td><span class="badge bg-success">متوفر</span></td>
-                                    <td class="action-buttons">
-                                        <button class="btn btn-sm btn-outline-primary" onclick="editProduct(1)"><i class="fas fa-edit"></i></button>
-                                        <button class="btn btn-sm btn-outline-danger" onclick="deleteProduct(1)"><i class="fas fa-trash"></i></button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><img src="https://via.placeholder.com/60" class="product-img" alt="منتج"></td>
-                                    <td>جهاز لوحي 10 بوصة</td>
-                                    <td>PRD-002</td>
-                                    <td>1,799 ر.س</td>
-                                    <td>32</td>
-                                    <td><span class="badge bg-success">متوفر</span></td>
-                                    <td class="action-buttons">
-                                        <button class="btn btn-sm btn-outline-primary" onclick="editProduct(2)"><i class="fas fa-edit"></i></button>
-                                        <button class="btn btn-sm btn-outline-danger" onclick="deleteProduct(2)"><i class="fas fa-trash"></i></button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    <nav aria-label="Page navigation" class="mt-3">
-                        <ul class="pagination justify-content-center">
-                            <li class="page-item disabled">
-                                <a class="page-link" href="#" tabindex="-1">السابق</a>
-                            </li>
-                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                            <li class="page-item"><a class="page-link" href="#">2</a></li>
-                            <li class="page-item">
-                                <a class="page-link" href="#">التالي</a>
-                            </li>
-                        </ul>
-                    </nav>
-                </div>
-            </div>
+        <div style="margin-top:12px;">
+          <button id="restart">إعادة الاختبار</button>
         </div>
+      `;
+      resultsArea.innerHTML = summaryHtml;
 
-        <!-- صفحة المبيعات -->
-        <div class="page" id="sales">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2>إدارة المبيعات</h2>
-                <button class="btn btn-primary" onclick="openAddOrderModal()">
-                    <i class="fas fa-plus me-2"></i>إنشاء طلب جديد
-                </button>
-            </div>
+      document.getElementById('restart').addEventListener('click', () => {
+        // إعادة تعيين
+        currentIndex = 0;
+        answers.fill(null);
+        resultsArea.style.display = 'none';
+        quizArea.style.display = 'block';
+        renderQuestion();
+      });
+    }
 
-            <div class="row mb-4">
-                <div class="col-md-3 col-6">
-                    <div class="card stat-card bg-primary text-white">
-                        <i class="fas fa-shopping-cart"></i>
-                        <div class="number">248</div>
-                        <div class="label">إجمالي الطلبات</div>
-                    </div>
-                </div>
-                <div class="col-md-3 col-6">
-                    <div class="card stat-card bg-success text-white">
-                        <i class="fas fa-check-circle"></i>
-                        <div class="number">185</div>
-                        <div class="label">طلبات مكتملة</div>
-                    </div>
-                </div>
-                <div class="col-md-3 col-6">
-                    <div class="card stat-card bg-warning text-white">
-                        <i class="fas fa-clock"></i>
-                        <div class="number">42</div>
-                        <div class="label">طلبات قيد المعالجة</div>
-                    </div>
-                </div>
-                <div class="col-md-3 col-6">
-                    <div class="card stat-card bg-danger text-white">
-                        <i class="fas fa-times-circle"></i>
-                        <div class="number">21</div>
-                        <div class="label">طلبات ملغاة</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                    <h5 class="card-title mb-0">جميع طلبات المبيعات</h5>
-                    <div>
-                        <button class="btn btn-sm btn-light me-2" onclick="filterOrders()"><i class="fas fa-filter me-1"></i>تصفية</button>
-                        <button class="btn btn-sm btn-light" onclick="exportOrders()"><i class="fas fa-download me-1"></i>تصدير</button>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>رقم الطلب</th>
-                                    <th>العميل</th>
-                                    <th>التاريخ</th>
-                                    <th>القيمة</th>
-                                    <th>طريقة الدفع</th>
-                                    <th>الحالة</th>
-                                    <th>الإجراءات</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>#ORD-2023-1052</td>
-                                    <td>شركة التقنية الحديثة</td>
-                                    <td>2023-10-15</td>
-                                    <td>5,250 ر.س</td>
-                                    <td>تحويل بنكي</td>
-                                    <td><span class="badge bg-success">مكتمل</span></td>
-                                    <td class="action-buttons">
-                                        <button class="btn btn-sm btn-outline-primary" onclick="viewOrder(1052)"><i class="fas fa-eye"></i></button>
-                                        <button class="btn btn-sm btn-outline-info" onclick="printOrder(1052)"><i class="fas fa-print"></i></button>
-                                        <button class="btn btn-sm btn-outline-danger" onclick="cancelOrder(1052)"><i class="fas fa-times"></i></button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>#ORD-2023-1051</td>
-                                    <td>مؤسسة النهضة للتجارة</td>
-                                    <td>2023-10-14</td>
-                                    <td>3,800 ر.س</td>
-                                    <td>بطاقة ائتمان</td>
-                                    <td><span class="badge bg-warning">قيد المعالجة</span></td>
-                                    <td class="action-buttons">
-                                        <button class="btn btn-sm btn-outline-primary" onclick="viewOrder(1051)"><i class="fas fa-eye"></i></button>
-                                        <button class="btn btn-sm btn-outline-info" onclick="printOrder(1051)"><i class="fas fa-print"></i></button>
-                                        <button class="btn btn-sm btn-outline-danger" onclick="cancelOrder(1051)"><i class="fas fa-times"></i></button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    <nav aria-label="Page navigation" class="mt-3">
-                        <ul class="pagination justify-content-center">
-                            <li class="page-item disabled">
-                                <a class="page-link" href="#" tabindex="-1">السابق</a>
-                            </li>
-                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                            <li class="page-item"><a class="page-link" href="#">2</a></li>
-                            <li class="page-item">
-                                <a class="page-link" href="#">التالي</a>
-                            </li>
-                        </ul>
-                    </nav>
-                </div>
-            </div>
-        </div>
-
-        <!-- صفحات إضافية -->
-        <div class="page" id="purchases">
-            <h2>إدارة المشتريات</h2>
-            <p>هذه صفحة إدارة المشتريات. سيتم تنفيذها بنفس نمط الصفحات الأخرى.</p>
-        </div>
-
-        <div class="page" id="customers">
-            <h2>إدارة العملاء</h2>
-            <p>هذه صفحة إدارة العملاء. سيتم تنفيذها بنفس نمط الصفحات الأخرى.</p>
-        </div>
-
-        <div class="page" id="suppliers">
-            <h2>إدارة الموردين</h2>
-            <p>هذه صفحة إدارة الموردين. سيتم تنفيذها بنفس نمط الصفحات الأخرى.</p>
-        </div>
-
-        <div class="page" id="reports">
-            <h2>التقارير والإحصائيات</h2>
-            <p>هذه صفحة التقارير والإحصائيات. سيتم تنفيذها بنفس نمط الصفحات الأخرى.</p>
-        </div>
-
-        <div class="page" id="accounting">
-            <h2>إدارة الحسابات</h2>
-            <p>هذه صفحة إدارة الحسابات. سيتم تنفيذها بنفس نمط الصفحات الأخرى.</p>
-        </div>
-
-        <div class="page" id="settings">
-            <h2>الإعدادات</h2>
-            <p>هذه صفحة الإعدادات. سيتم تنفيذها بنفس نمط الصفحات الأخرى.</p>
-        </div>
-    </div>
-
-    <!-- Modal لإضافة منتج جديد -->
-    <div id="addProductModal" class="modal" style="display: none; position: fixed; z-index: 1060; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5);">
-        <div class="modal-dialog modal-lg" style="position: relative; margin: 10% auto; background-color: white; border-radius: 10px; max-width: 800px;">
-            <div class="modal-content">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title">إضافة منتج جديد</h5>
-                    <button type="button" class="btn-close" onclick="closeModal('addProductModal')" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="addProductForm">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="productName" class="form-label">اسم المنتج</label>
-                                <input type="text" class="form-control" id="productName" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="productSku" class="form-label">رقم SKU</label>
-                                <input type="text" class="form-control" id="productSku" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="productCategory" class="form-label">الفئة</label>
-                                <select class="form-select" id="productCategory" required>
-                                    <option value="" selected disabled>اختر الفئة</option>
-                                    <option value="electronics">الإلكترونيات</option>
-                                    <option value="computers">ملحقات الحاسب</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="productPrice" class="form-label">السعر</label>
-                                <input type="number" class="form-control" id="productPrice" step="0.01" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="productQuantity" class="form-label">الكمية</label>
-                                <input type="number" class="form-control" id="productQuantity" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="productImage" class="form-label">صورة المنتج</label>
-                                <input type="file" class="form-control" id="productImage" accept="image/*">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="productStatus" class="form-label">الحالة</label>
-                                <select class="form-select" id="productStatus" required>
-                                    <option value="active">نشط</option>
-                                    <option value="inactive">غير نشط</option>
-                                </select>
-                            </div>
-                            <div class="col-12 mb-3">
-                                <label for="productDescription" class="form-label">وصف المنتج</label>
-                                <textarea class="form-control" id="productDescription" rows="3"></textarea>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('addProductModal')">إلغاء</button>
-                    <button type="button" class="btn btn-primary" onclick="addProduct()">حفظ المنتج</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal لإنشاء طلب جديد -->
-    <div id="addOrderModal" class="modal" style="display: none; position: fixed; z-index: 1060; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5);">
-        <div class="modal-dialog modal-lg" style="position: relative; margin: 5% auto; background-color: white; border-radius: 10px; max-width: 900px;">
-            <div class="modal-content">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title">إنشاء طلب جديد</h5>
-                    <button type="button" class="btn-close" onclick="closeModal('addOrderModal')" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="addOrderForm">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="orderCustomer" class="form-label">اختر العميل</label>
-                                <select class="form-select" id="orderCustomer" required>
-                                    <option value="" selected disabled>اختر العميل</option>
-                                    <option value="1">شركة التقنية الحديثة</option>
-                                    <option value="2">مؤسسة النهضة للتجارة</option>
-                                    <option value="3">شركة المستقبل المحدودة</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="orderDate" class="form-label">تاريخ الطلب</label>
-                                <input type="date" class="form-control" id="orderDate" required>
-                            </div>
-                            <div class="col-12 mb-3">
-                                <label class="form-label">إضافة منتجات للطلب</label>
-                                <div class="table-responsive">
-                                    <table class="table table-bordered">
-                                        <thead>
-                                            <tr>
-                                                <th>المنتج</th>
-                                                <th width="100">الكمية</th>
-                                                <th width="120">السعر</th>
-                                                <th width="100">الإجمالي</th>
-                                                <th width="50"></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="orderItems">
-                                            <tr>
-                                                <td>
-                                                    <select class="form-select product-select" onchange="calculateOrderTotal()">
-                                                        <option value="" selected disabled>اختر المنتج</option>
-                                                        <option value="1" data-price="2499">هاتف ذكي - طراز Pro</option>
-                                                        <option value="2" data-price="1799">جهاز لوحي 10 بوصة</option>
-                                                        <option value="3" data-price="499">سماعات لاسلكية</option>
-                                                    </select>
-                                                </td>
-                                                <td>
-                                                    <input type="number" class="form-control quantity" value="1" min="1" onchange="calculateOrderTotal()">
-                                                </td>
-                                                <td>
-                                                    <input type="text" class="form-control price" readonly>
-                                                </td>
-                                                <td>
-                                                    <input type="text" class="form-control total" readonly>
-                                                </td>
-                                                <td>
-                                                    <button type="button" class="btn btn-sm btn-danger" onclick="removeOrderItem(this)">
-                                                        <i class="fas fa-times"></i>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                        <tfoot>
-                                            <tr>
-                                                <td colspan="5">
-                                                    <button type="button" class="btn btn-sm btn-primary" onclick="addOrderItem()">
-                                                        <i class="fas fa-plus me-1"></i>إضافة منتج
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td colspan="3" class="text-end"><strong>المجموع الكلي:</strong></td>
-                                                <td colspan="2">
-                                                    <input type="text" class="form-control grand-total" readonly>
-                                                </td>
-                                            </tr>
-                                        </tfoot>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('addOrderModal')">إلغاء</button>
-                    <button type="button" class="btn btn-primary" onclick="addOrder()">حفظ الطلب</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // تخزين البيانات
-        let products = [
-            { id: 1, name: "هاتف ذكي - طراز Pro", sku: "PRD-001", price: 2499, quantity: 45, status: "active" },
-            { id: 2, name: "جهاز لوحي 10 بوصة", sku: "PRD-002", price: 1799, quantity: 32, status: "active" }
-        ];
-
-        let orders = [
-            { id: 1052, customer: "شركة التقنية الحديثة", date: "2023-10-15", total: 5250, status: "completed" },
-            { id: 1051, customer: "مؤسسة النهضة للتجارة", date: "2023-10-14", total: 3800, status: "processing" }
-        ];
-
-        // دالة للتبديل بين الصفحات
-        function showPage(pageId) {
-            console.log("محاولة عرض الصفحة: " + pageId);
-            
-            // إخفاء جميع الصفحات
-            document.querySelectorAll('.page').forEach(page => {
-                page.classList.remove('active');
-            });
-            
-            // إزالة النشاط من جميع عناصر القائمة
-            document.querySelectorAll('.sidebar .nav-link').forEach(link => {
-                link.classList.remove('active');
-            });
-            
-            // إظهار الصفحة المطلوبة
-            const targetPage = document.getElementById(pageId);
-            if (targetPage) {
-                targetPage.classList.add('active');
-                
-                // إضافة النشاط لعنصر القائمة المناسب
-                const menuItem = document.querySelector(`.sidebar .nav-link[onclick="showPage('${pageId}')"]`);
-                if (menuItem) {
-                    menuItem.classList.add('active');
-                }
-            } else {
-                console.error("الصفحة غير موجودة: " + pageId);
-                showPage('dashboard'); // العودة للوحة التحكم في حالة الخطأ
-            }
-        }
-        
-        // دالة للتبديل بين فتح وإغلاق القائمة الجانبية
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const mainContent = document.getElementById('main-content');
-            const toggleIcon = document.getElementById('sidebar-toggle-icon');
-            
-            sidebar.classList.toggle('collapsed');
-            mainContent.classList.toggle('expanded');
-            
-            if (sidebar.classList.contains('collapsed')) {
-                toggleIcon.classList.remove('fa-chevron-right');
-                toggleIcon.classList.add('fa-chevron-left');
-                if (document.querySelector('.sidebar .nav-link:last-child span')) {
-                    document.querySelector('.sidebar .nav-link:last-child span').textContent = 'فتح القائمة';
-                }
-            } else {
-                toggleIcon.classList.remove('fa-chevron-left');
-                toggleIcon.classList.add('fa-chevron-right');
-                if (document.querySelector('.sidebar .nav-link:last-child span')) {
-                    document.querySelector('.sidebar .nav-link:last-child span').textContent = 'طي القائمة';
-                }
-            }
-        }
-        
-        // دالة للجوال لإظهار/إخفاء القائمة الجانبية
-        function toggleMobileSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('expanded');
-        }
-        
-        // دالة لإظهار/إخفاء القائمة المنسدلة
-        function toggleDropdown() {
-            const dropdown = document.getElementById('userDropdown');
-            if (dropdown.style.display === 'block') {
-                dropdown.style.display = 'none';
-            } else {
-                dropdown.style.display = 'block';
-            }
-        }
-        
-        // إغلاق القائمة المنسدلة عند النقر خارجها
-        document.addEventListener('click', function(event) {
-            const dropdown = document.getElementById('userDropdown');
-            const dropdownToggle = document.querySelector('.dropdown-toggle');
-            
-            if (dropdown && !dropdown.contains(event.target) && !dropdownToggle.contains(event.target)) {
-                dropdown.style.display = 'none';
-            }
-        });
-        
-        // دالة لإظهار الإشعارات
-        function showNotifications() {
-            alert('هنا سيتم عرض الإشعارات والتنبيهات الخاصة بك');
-        }
-        
-        // دالة لفتح modal إضافة منتج
-        function openAddProductModal() {
-            document.getElementById('addProductModal').style.display = 'block';
-        }
-        
-        // دالة لفتح modal إنشاء طلب
-        function openAddOrderModal() {
-            // تعيين تاريخ اليوم كتاريخ افتراضي للطلب
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('orderDate').value = today;
-            
-            document.getElementById('addOrderModal').style.display = 'block';
-        }
-        
-        // دالة لإغلاق modal
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-        }
-        
-        // دالة لإضافة منتج جديد
-        function addProduct() {
-            const productName = document.getElementById('productName').value;
-            const productSku = document.getElementById('productSku').value;
-            
-            if (!productName || !productSku) {
-                alert('يرجى ملء جميع الحقول المطلوبة');
-                return;
-            }
-            
-            // إنشاء منتج جديد
-            const newProduct = {
-                id: products.length + 1,
-                name: productName,
-                sku: productSku,
-                price: parseFloat(document.getElementById('productPrice').value),
-                quantity: parseInt(document.getElementById('productQuantity').value),
-                status: document.getElementById('productStatus').value
-            };
-            
-            // إضافة المنتج إلى القائمة
-            products.push(newProduct);
-            
-            alert(`تم إضافة المنتج "${productName}" بنجاح!`);
-            document.getElementById('addProductForm').reset();
-            closeModal('addProductModal');
-            
-            // إعادة تحميل صفحة المخزون لعرض المنتج الجديد
-            if (document.getElementById('inventory').classList.contains('active')) {
-                loadInventoryPage();
-            }
-        }
-        
-        // دالة لتحرير منتج
-        function editProduct(productId) {
-            const product = products.find(p => p.id === productId);
-            if (product) {
-                // ملء النموذج ببيانات المنتج
-                document.getElementById('productName').value = product.name;
-                document.getElementById('productSku').value = product.sku;
-                document.getElementById('productPrice').value = product.price;
-                document.getElementById('productQuantity').value = product.quantity;
-                document.getElementById('productStatus').value = product.status;
-                
-                // فتح Modal التعديل
-                openAddProductModal();
-                
-                // تغيير نص الزر إلى "تحديث المنتج"
-                document.querySelector('#addProductModal .btn-primary').textContent = 'تحديث المنتج';
-                
-                // تغيير وظيفة الزر لتحديث المنتج بدلاً من إضافة منتج جديد
-                document.querySelector('#addProductModal .btn-primary').onclick = function() {
-                    updateProduct(productId);
-                };
-            }
-        }
-        
-        // دالة لتحديث منتج
-        function updateProduct(productId) {
-            const productIndex = products.findIndex(p => p.id === productId);
-            if (productIndex !== -1) {
-                // تحديث بيانات المنتج
-                products[productIndex].name = document.getElementById('productName').value;
-                products[productIndex].sku = document.getElementById('productSku').value;
-                products[productIndex].price = parseFloat(document.getElementById('productPrice').value);
-                products[productIndex].quantity = parseInt(document.getElementById('productQuantity').value);
-                products[productIndex].status = document.getElementById('productStatus').value;
-                
-                alert('تم تحديث المنتج بنجاح!');
-                closeModal('addProductModal');
-                
-                // إعادة تحميل صفحة المخزون
-                loadInventoryPage();
-            }
-        }
-        
-        // دالة لحذف منتج
-        function deleteProduct(productId) {
-            if (confirm('هل أنت متأكد من أنك تريد حذف هذا المنتج؟')) {
-                products = products.filter(p => p.id !== productId);
-                alert('تم حذف المنتج بنجاح!');
-                
-                // إعادة تحميل صفحة المخزون
-                loadInventoryPage();
-            }
-        }
-        
-        // دالة لتحميل صفحة المخزون
-        function loadInventoryPage() {
-            // هنا يمكنك إضافة كود لتحديث جدول المنتجات
-            console.log('يجب تحديث جدول المنتجات هنا');
-        }
-        
-        // دالة لإضافة عنصر طلب جديد
-        function addOrderItem() {
-            const orderItems = document.getElementById('orderItems');
-            const newRow = document.createElement('tr');
-            newRow.innerHTML = `
-                <td>
-                    <select class="form-select product-select" onchange="calculateOrderTotal()">
-                        <option value="" selected disabled>اختر المنتج</option>
-                        <option value="1" data-price="2499">هاتف ذكي - طراز Pro</option>
-                        <option value="2" data-price="1799">جهاز لوحي 10 بوصة</option>
-                        <option value="3" data-price="499">سماعات لاسلكية</option>
-                    </select>
-                </td>
-                <td>
-                    <input type="number" class="form-control quantity" value="1" min="1" onchange="calculateOrderTotal()">
-                </td>
-                <td>
-                    <input type="text" class="form-control price" readonly>
-                </td>
-                <td>
-                    <input type="text" class="form-control total" readonly>
-                </td>
-                <td>
-                    <button type="button" class="btn btn-sm btn-danger" onclick="removeOrderItem(this)">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </td>
-            `;
-            orderItems.appendChild(newRow);
-        }
-        
-        // دالة لإزالة عنصر من الطلب
-        function removeOrderItem(button) {
-            const row = button.closest('tr');
-            if (document.getElementById('orderItems').childElementCount > 1) {
-                row.remove();
-                calculateOrderTotal();
-            } else {
-                alert('يجب أن يحتوي الطلب على عنصر واحد على الأقل');
-            }
-        }
-        
-        // دالة لحساب المجموع الكلي للطلب
-        function calculateOrderTotal() {
-            let grandTotal = 0;
-            
-            document.querySelectorAll('#orderItems tr').forEach(row => {
-                const productSelect = row.querySelector('.product-select');
-                const quantityInput = row.querySelector('.quantity');
-                const priceInput = row.querySelector('.price');
-                const totalInput = row.querySelector('.total');
-                
-                if (productSelect.value) {
-                    const price = parseFloat(productSelect.selectedOptions[0].dataset.price);
-                    const quantity = parseInt(quantityInput.value) || 0;
-                    const total = price * quantity;
-                    
-                    priceInput.value = price.toFixed(2);
-                    totalInput.value = total.toFixed(2);
-                    grandTotal += total;
-                } else {
-                    priceInput.value = '';
-                    totalInput.value = '';
-                }
-            });
-            
-            document.querySelector('.grand-total').value = grandTotal.toFixed(2);
-        }
-        
-        // دالة لإضافة طلب جديد
-        function addOrder() {
-            const orderCustomer = document.getElementById('orderCustomer').value;
-            
-            if (!orderCustomer) {
-                alert('يرجى اختيار عميل للطلب');
-                return;
-            }
-            
-            // إنشاء طلب جديد
-            const newOrder = {
-                id: orders.length + 1000,
-                customer: document.getElementById('orderCustomer').selectedOptions[0].text,
-                date: document.getElementById('orderDate').value,
-                total: parseFloat(document.querySelector('.grand-total').value),
-                status: 'pending'
-            };
-            
-            // إضافة الطلب إلى القائمة
-            orders.push(newOrder);
-            
-            alert('تم إنشاء الطلب بنجاح!');
-            document.getElementById('addOrderForm').reset();
-            closeModal('addOrderModal');
-            
-            // إعادة تحميل صفحة المبيعات لعرض الطلب الجديد
-            if (document.getElementById('sales').classList.contains('active')) {
-                loadSalesPage();
-            }
-        }
-        
-        // دالة لتحميل صفحة المبيعات
-        function loadSalesPage() {
-            // هنا يمكنك إضافة كود لتحديث جدول الطلبات
-            console.log('يجب تحديث جدول الطلبات هنا');
-        }
-        
-        // دوال أخرى للوظائف
-        function viewOrder(orderId) {
-            alert(`عرض تفاصيل الطلب #${orderId}`);
-        }
-        
-        function printOrder(orderId) {
-            alert(`طباعة الطلب #${orderId}`);
-        }
-        
-        function cancelOrder(orderId) {
-            if (confirm('هل أنت متأكد من أنك تريد إلغاء هذا الطلب؟')) {
-                alert(`تم إلغاء الطلب #${orderId}`);
-            }
-        }
-        
-        function filterOrders() {
-            alert('فتح نافذة تصفية الطلبات');
-        }
-        
-        function exportOrders() {
-            alert('تصدير بيانات الطلبات');
-        }
-        
-        // إضافة معالجات الأحداث عند تحميل الصفحة
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log("تم تحميل الصفحة بنجاح");
-            
-            // إخفاء القائمة الجانبية تلقائياً على الجوال
-            if (window.innerWidth < 992) {
-                const sidebar = document.getElementById('sidebar');
-                const mainContent = document.getElementById('main-content');
-                
-                if (!sidebar.classList.contains('collapsed')) {
-                    sidebar.classList.add('collapsed');
-                }
-                
-                if (!mainContent.classList.contains('expanded')) {
-                    mainContent.classList.add('expanded');
-                }
-            }
-            
-            // إغلاق modal عند النقر خارج المحتوى
-            window.onclick = function(event) {
-                const modals = document.querySelectorAll('.modal');
-                modals.forEach(modal => {
-                    if (event.target == modal) {
-                        modal.style.display = 'none';
-                    }
-                });
-            }
-            
-            // تهيئة تاريخ اليوم في نموذج الطلب
-            const today = new Date().toISOString().split('T')[0];
-            if (document.getElementById('orderDate')) {
-                document.getElementById('orderDate').value = today;
-            }
-        });
-        
-        // معالجة الأخطاء العامة
-        window.onerror = function(msg, url, lineNo, columnNo, error) {
-            console.error("خطأ: " + msg + "\nفي: " + url + "\nالسطر: " + lineNo);
-            return false;
-        };
-    </script>
+    // ابدأ أول سؤال
+    renderQuestion();
+  </script>
 </body>
 </html>
