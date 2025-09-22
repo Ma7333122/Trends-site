@@ -243,6 +243,11 @@
                 text-align: center;
                 margin-bottom: 15px;
             }
+            
+            .assistant-panel {
+                width: 90% !important;
+                right: 5% !important;
+            }
         }
 
         .input-sidebar {
@@ -251,12 +256,14 @@
             border-radius: 10px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
             height: fit-content;
+            position: relative;
         }
 
         .form-section {
             margin-bottom: 30px;
             padding-bottom: 20px;
             border-bottom: 1px solid #eee;
+            position: relative;
         }
 
         .form-section:last-child {
@@ -732,9 +739,188 @@
             margin-left: 0;
             margin-right: 5px;
         }
+        
+        /* مساعد الذكاء الاصطناعي */
+        .assistant-panel {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 300px;
+            background: var(--white);
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            overflow: hidden;
+            display: none;
+            transition: all 0.3s;
+        }
+        
+        .assistant-header {
+            background: var(--primary-color);
+            color: var(--white);
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .assistant-content {
+            padding: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .assistant-message {
+            margin-bottom: 10px;
+            padding: 10px;
+            background: #f0f8ff;
+            border-radius: 5px;
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        .assistant-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 1001;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+        }
+        
+        .assistant-toggle:hover {
+            transform: scale(1.1);
+        }
+        
+        .help-icon {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            color: var(--primary-color);
+            cursor: pointer;
+            font-size: 18px;
+        }
+        
+        .help-tooltip {
+            position: absolute;
+            top: 40px;
+            left: 0;
+            background: var(--secondary-color);
+            color: var(--white);
+            padding: 10px;
+            border-radius: 5px;
+            width: 250px;
+            z-index: 10;
+            display: none;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        }
+        
+        .help-icon:hover + .help-tooltip {
+            display: block;
+        }
+        
+        /* تحسينات للشريط العلوي */
+        .nav-progress {
+            height: 4px;
+            background: var(--primary-color);
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0%;
+            transition: width 0.5s;
+        }
+        
+        /* تحسينات للقوالب */
+        .template-features {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .template-feature {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+        
+        /* تحسينات للزر الرئيسي */
+        .floating-action {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            background: var(--accent-color);
+            color: var(--white);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.2);
+            z-index: 999;
+            transition: all 0.3s;
+        }
+        
+        .floating-action:hover {
+            transform: scale(1.1);
+        }
+        
+        /* أنماط للطبع */
+        @media print {
+            nav, .hero, .features, .templates-section, .contact-section, footer, 
+            .language-selector, .assistant-toggle, .floating-action, .form-actions {
+                display: none !important;
+            }
+            
+            .cv-preview {
+                box-shadow: none;
+                padding: 0;
+            }
+            
+            body {
+                background: white;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- زر الطفو السريع -->
+    <div class="floating-action" onclick="startCreating()" title="بدء إنشاء السيرة الذاتية">
+        <i class="fas fa-plus"></i>
+    </div>
+
+    <!-- مساعد الذكاء الاصطناعي -->
+    <div class="assistant-toggle" id="assistantToggle">
+        <i class="fas fa-robot"></i>
+    </div>
+    
+    <div class="assistant-panel" id="assistantPanel">
+        <div class="assistant-header">
+            <h3>مساعد السيرة الذاتية</h3>
+            <i class="fas fa-times" id="closeAssistant"></i>
+        </div>
+        <div class="assistant-content" id="assistantContent">
+            <div class="assistant-message">
+                مرحباً! أنا مساعدك الذكي لإنشاء السيرة الذاتية. سأقدم لك النصائح والإرشادات لإنشاء سيرة ذاتية مثالية.
+            </div>
+        </div>
+    </div>
+
     <div class="language-selector">
         <select id="languageSelect">
             <option value="ar">العربية</option>
@@ -744,6 +930,7 @@
 
     <header>
         <nav>
+            <div class="nav-progress" id="navProgress"></div>
             <div class="nav-container">
                 <div class="logo">
                     <h1 id="logo-text">سيرتي</h1>
@@ -815,14 +1002,26 @@
                     <div class="template-option active" data-template="modern">
                         <div class="template-preview modern-preview" id="template-modern">قالب حديث</div>
                         <p id="template-modern-desc">قالب عصري</p>
+                        <div class="template-features">
+                            <span class="template-feature"><i class="fas fa-check"></i> <span id="modern-feature1">تصميم عصري</span></span>
+                            <span class="template-feature"><i class="fas fa-check"></i> <span id="modern-feature2">مناسب للتقنيين</span></span>
+                        </div>
                     </div>
                     <div class="template-option" data-template="professional">
                         <div class="template-preview professional-preview" id="template-professional">قالب احترافي</div>
                         <p id="template-professional-desc">قالب تقليدي</p>
+                        <div class="template-features">
+                            <span class="template-feature"><i class="fas fa-check"></i> <span id="professional-feature1">مظهر احترافي</span></span>
+                            <span class="template-feature"><i class="fas fa-check"></i> <span id="professional-feature2">مناسب للشركات</span></span>
+                        </div>
                     </div>
                     <div class="template-option" data-template="creative">
                         <div class="template-preview creative-preview" id="template-creative">قالب إبداعي</div>
                         <p id="template-creative-desc">قالب مبدع</p>
+                        <div class="template-features">
+                            <span class="template-feature"><i class="fas fa-check"></i> <span id="creative-feature1">تصميم مبدع</span></span>
+                            <span class="template-feature"><i class="fas fa-check"></i> <span id="creative-feature2">مناسب للمبدعين</span></span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -878,6 +1077,11 @@
                     <div class="input-sidebar">
                         <form id="cvForm">
                             <div class="form-section">
+                                <i class="fas fa-question-circle help-icon"></i>
+                                <div class="help-tooltip">
+                                    <strong>المعلومات الشخصية</strong><br>
+                                    أدخل معلوماتك الأساسية التي تظهر في أعلى السيرة الذاتية. تأكد من صحة البريد الإلكتروني ورقم الهاتف.
+                                </div>
                                 <h3 id="personal-info-title">المعلومات الشخصية</h3>
                                 <input type="text" id="name" placeholder="الاسم الكامل" required>
                                 <input type="email" id="email" placeholder="البريد الإلكتروني">
@@ -888,6 +1092,11 @@
                             </div>
 
                             <div class="form-section">
+                                <i class="fas fa-question-circle help-icon"></i>
+                                <div class="help-tooltip">
+                                    <strong>الخبرة العملية</strong><br>
+                                    اذكر خبراتك العملية السابقة مع التركيز على الإنجازات والمسؤوليات. استخدم أفعال قوية لوصف إنجازاتك.
+                                </div>
                                 <h3 id="experience-title">الخبرة العملية</h3>
                                 <div id="experiences">
                                     <div class="experience-item">
@@ -902,6 +1111,11 @@
                             </div>
 
                             <div class="form-section">
+                                <i class="fas fa-question-circle help-icon"></i>
+                                <div class="help-tooltip">
+                                    <strong>التعليم</strong><br>
+                                    اذكر مؤهلاتك التعليمية بدءاً من أحدثها. يمكنك إضافة التفاصيل المهمة مثل المعدل التراكمي أو المواد المتخصصة.
+                                </div>
                                 <h3 id="education-title">التعليم</h3>
                                 <div id="educations">
                                     <div class="education-item">
@@ -916,6 +1130,11 @@
                             </div>
 
                             <div class="form-section">
+                                <i class="fas fa-question-circle help-icon"></i>
+                                <div class="help-tooltip">
+                                    <strong>المهارات</strong><br>
+                                    اذكر مهاراتك التقنية والشخصية ذات الصلة بالوظيفة. صنفها حسب مستوى إتقانك (مبتدئ، متوسط، متقدم، خبير).
+                                </div>
                                 <h3 id="skills-title">المهارات</h3>
                                 <div id="skills-container">
                                     <div class="skill-item">
@@ -934,6 +1153,11 @@
                             </div>
                             
                             <div class="form-section">
+                                <i class="fas fa-question-circle help-icon"></i>
+                                <div class="help-tooltip">
+                                    <strong>معلومات إضافية</strong><br>
+                                    أضف أي معلومات إضافية تزيد من قوة سيرتك الذاتية مثل اللغات، الشهادات، المشاريع الشخصية، أو الهوايات ذات الصلة.
+                                </div>
                                 <h3 id="additional-title">معلومات إضافية</h3>
                                 <textarea id="languages" placeholder="اللغات التي تتقنها" rows="2"></textarea>
                                 <textarea id="certifications" placeholder="الشهادات والدورات" rows="2"></textarea>
@@ -1014,9 +1238,9 @@
                 <div class="contact-info">
                     <p id="contact-desc">للاستفسارات والدعم الفني، يرجى التواصل معنا عبر:</p>
                     <ul>
-                        <li><i class="fas fa-envelope"></i> <span id="contact-email">البريد الإلكتروني: support@cvmaker.com</span></li>
-                        <li><i class="fas fa-phone"></i> <span id="contact-phone">الهاتف: 0123456789</span></li>
-                        <li><i class="fas fa-map-marker-alt"></i> <span id="contact-address">العنوان: المدينة، الشارع، الدولة</span></li>
+                        <li><i class="fas fa-envelope"></i> <span id="contact-email"> البريد الإلكتروني: ma7333122@gmail.com </span></li>
+                        <li><i class="fas fa-phone"></i> <span id="contact-phone"> الهاتف: 01010421571 </span></li>
+                        <li><i class="fas fa-map-marker-alt"></i> <span id="contact-address"> العنوان:المنصوره الدقهليه مصر </span></li>
                     </ul>
                 </div>
             </div>
@@ -1062,6 +1286,12 @@
                 "template-professional-desc": "قالب تقليدي",
                 "template-creative": "قالب إبداعي",
                 "template-creative-desc": "قالب مبدع",
+                "modern-feature1": "تصميم عصري",
+                "modern-feature2": "مناسب للتقنيين",
+                "professional-feature1": "مظهر احترافي",
+                "professional-feature2": "مناسب للشركات",
+                "creative-feature1": "تصميم مبدع",
+                "creative-feature2": "مناسب للمبدعين",
                 "builder-title": "محرر السيرة الذاتية",
                 "completeness-text": "اكتمال السيرة الذاتية:",
                 "loading-text": "جاري تحميل السيرة الذاتية...",
@@ -1101,7 +1331,13 @@
                 "contact-address": "العنوان: المدينة، الشارع، الدولة",
                 "footer-text": "© 2024 جميع الحقوق محفوظة - منشئ السيرة الذاتية",
                 "success-alert": "تم تحديث السيرة الذاتية بنجاح!",
-                "upload-alert": "تم رفع الملف بنجاح! جاري تحليل المحتوى..."
+                "upload-alert": "تم رفع الملف بنجاح! جاري تحليل المحتوى...",
+                "assistant-welcome": "مرحباً! أنا مساعدك الذكي لإنشاء السيرة الذاتية. سأقدم لك النصائح والإرشادات لإنشاء سيرة ذاتية مثالية.",
+                "assistant-personal-tip": "نصيحة: تأكد من أن معلوماتك الشخصية كاملة وصحيحة، فهي أول ما يراه مسؤولو التوظيف.",
+                "assistant-experience-tip": "نصيحة: ركز على الإنجازات وليس فقط المسؤوليات. استخدم أرقاماً ونسباً مئوية لتوضيح تأثيرك.",
+                "assistant-education-tip": "نصيحة: اذكر أحدث مؤهلاتك التعليمية أولاً، وأضف أي جوائز أو تكريمات حصلت عليها.",
+                "assistant-skills-tip": "نصيحة: صنف مهاراتك حسب مستوى الإتقان ورتبها حسب الأهمية للوظيفة التي تتقدم لها.",
+                "assistant-additional-tip": "نصيحة: اللغات الإضافية والشهادات التخصصية تزيد من فرصك في سوق العمل التنافسي."
             },
             en: {
                 // النصوص الإنجليزية
@@ -1133,6 +1369,12 @@
                 "template-professional-desc": "Traditional Design",
                 "template-creative": "Creative Template",
                 "template-creative-desc": "Creative Design",
+                "modern-feature1": "Modern Design",
+                "modern-feature2": "Ideal for Tech",
+                "professional-feature1": "Professional Look",
+                "professional-feature2": "Corporate Friendly",
+                "creative-feature1": "Creative Design",
+                "creative-feature2": "Perfect for Creatives",
                 "builder-title": "Resume Builder",
                 "completeness-text": "Resume Completeness:",
                 "loading-text": "Loading Resume...",
@@ -1172,7 +1414,13 @@
                 "contact-address": "Address: City, Street, Country",
                 "footer-text": "© 2024 All Rights Reserved - Resume Builder",
                 "success-alert": "Resume updated successfully!",
-                "upload-alert": "File uploaded successfully! Analyzing content..."
+                "upload-alert": "File uploaded successfully! Analyzing content...",
+                "assistant-welcome": "Hello! I'm your smart resume assistant. I'll provide you with tips and guidance to create the perfect resume.",
+                "assistant-personal-tip": "Tip: Make sure your personal information is complete and accurate, as it's the first thing recruiters see.",
+                "assistant-experience-tip": "Tip: Focus on achievements, not just responsibilities. Use numbers and percentages to show your impact.",
+                "assistant-education-tip": "Tip: List your most recent educational qualifications first, and add any awards or honors you've received.",
+                "assistant-skills-tip": "Tip: Categorize your skills by proficiency level and order them by relevance to the job you're applying for.",
+                "assistant-additional-tip": "Tip: Additional languages and specialized certifications increase your chances in a competitive job market."
             }
         };
 
@@ -1206,6 +1454,21 @@
             // تحديث رسائل التنبيه
             document.getElementById('successAlert').textContent = translations[lang]['success-alert'];
             document.getElementById('uploadAlert').textContent = translations[lang]['upload-alert'];
+            
+            // تحديث رسائل المساعد
+            updateAssistantMessages(lang);
+        }
+
+        // تحديث رسائل المساعد
+        function updateAssistantMessages(lang) {
+            const assistantContent = document.getElementById('assistantContent');
+            if (assistantContent.children.length === 1) {
+                // إذا كانت الرسالة الافتراضية فقط، أضف رسالة الترحيب
+                const welcomeMessage = document.createElement('div');
+                welcomeMessage.className = 'assistant-message';
+                welcomeMessage.textContent = translations[lang]['assistant-welcome'];
+                assistantContent.appendChild(welcomeMessage);
+            }
         }
 
         // دالة للبدء في إنشاء السيرة
@@ -1213,6 +1476,41 @@
             document.getElementById('create').scrollIntoView({
                 behavior: 'smooth'
             });
+            showAssistantMessage('personal');
+        }
+
+        // إظهار رسالة المساعد حسب القسم
+        function showAssistantMessage(section) {
+            const lang = document.getElementById('languageSelect').value;
+            const assistantContent = document.getElementById('assistantContent');
+            const message = document.createElement('div');
+            message.className = 'assistant-message';
+            
+            switch(section) {
+                case 'personal':
+                    message.textContent = translations[lang]['assistant-personal-tip'];
+                    break;
+                case 'experience':
+                    message.textContent = translations[lang]['assistant-experience-tip'];
+                    break;
+                case 'education':
+                    message.textContent = translations[lang]['assistant-education-tip'];
+                    break;
+                case 'skills':
+                    message.textContent = translations[lang]['assistant-skills-tip'];
+                    break;
+                case 'additional':
+                    message.textContent = translations[lang]['assistant-additional-tip'];
+                    break;
+                default:
+                    message.textContent = translations[lang]['assistant-welcome'];
+            }
+            
+            assistantContent.appendChild(message);
+            assistantContent.scrollTop = assistantContent.scrollHeight;
+            
+            // إظهار لوحة المساعد إذا كانت مخفية
+            document.getElementById('assistantPanel').style.display = 'block';
         }
 
         // تحديث المعاينة
@@ -1383,6 +1681,9 @@
             const percent = Math.round((completeness / totalPoints) * 100);
             document.getElementById('completenessPercent').textContent = percent + '%';
             document.getElementById('completenessProgress').style.width = percent + '%';
+            
+            // تحديث شريط التقدم في الشريط العلوي
+            document.getElementById('navProgress').style.width = percent + '%';
         }
 
         // إضافة خبرة عمل جديدة
@@ -1398,6 +1699,7 @@
                 <button type="button" class="remove-btn" onclick="removeExperience(this)">حذف الخبرة</button>
             `;
             experiencesDiv.appendChild(newExperience);
+            showAssistantMessage('experience');
         }
 
         // حذف خبرة
@@ -1419,6 +1721,7 @@
                 <button type="button" class="remove-btn" onclick="removeEducation(this)">حذف المؤهل</button>
             `;
             educationsDiv.appendChild(newEducation);
+            showAssistantMessage('education');
         }
 
         // حذف تعليم
@@ -1444,6 +1747,7 @@
                 <button type="button" class="remove-btn" onclick="removeSkill(this)">حذف</button>
             `;
             skillsContainer.appendChild(newSkill);
+            showAssistantMessage('skills');
         }
 
         // حذف مهارة
@@ -1814,8 +2118,38 @@
                 changeLanguage(lang);
             });
             
+            // إعداد المساعد
+            document.getElementById('assistantToggle').addEventListener('click', function() {
+                const panel = document.getElementById('assistantPanel');
+                panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+            });
+            
+            document.getElementById('closeAssistant').addEventListener('click', function() {
+                document.getElementById('assistantPanel').style.display = 'none';
+            });
+            
+            // إضافة مستمعين للأقسام لإظهار النصائح
+            document.querySelectorAll('.form-section').forEach(section => {
+                section.addEventListener('mouseenter', function() {
+                    const title = this.querySelector('h3').textContent;
+                    if (title.includes('المعلومات الشخصية')) showAssistantMessage('personal');
+                    else if (title.includes('الخبرة العملية')) showAssistantMessage('experience');
+                    else if (title.includes('التعليم')) showAssistantMessage('education');
+                    else if (title.includes('المهارات')) showAssistantMessage('skills');
+                    else if (title.includes('معلومات إضافية')) showAssistantMessage('additional');
+                });
+            });
+            
             // تعيين اللغة الافتراضية
             changeLanguage('ar');
+        });
+
+        // تتبع التمرير لتحديث شريط التقدم
+        window.addEventListener('scroll', function() {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrollPercent = (scrollTop / scrollHeight) * 100;
+            document.getElementById('navProgress').style.width = scrollPercent + '%';
         });
     </script>
 </body>
